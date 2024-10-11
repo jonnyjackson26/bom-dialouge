@@ -1,0 +1,62 @@
+.title {
+    font-family: 'Roboto', sans-serif;
+}
+
+.light-mode {
+    background-color: #f8f9fa;
+    color: #151515;
+}
+
+.dark-mode {
+    background-color: #151515;
+    color: #f8f9fa;
+}
+
+
+.book-container-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    /* Adjust spacing between books */
+    justify-content: center;
+    /* Center books horizontally */
+}
+
+.book-grid {
+    flex: 1 1 100px;
+    /* Flex-grow, flex-shrink, flex-basis */
+    max-width: 200px;
+    /* Maximum width of each book */
+    min-width: 100px;
+    /* Minimum width of each book */
+    height: 60px;
+    /* Fixed height of each book */
+    padding: 10px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    /* Light border */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Box shadow */
+    transition: transform 0.2s ease-in-out;
+    /* Smooth hover effect */
+    text-decoration: none;
+    /* Remove underline from text links */
+    display: flex;
+    /* Use flexbox for vertical centering */
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    font-family: 'Roboto', sans-serif;
+    /* Use Roboto font */
+}
+
+.book-grid:hover {
+    transform: translateY(-5px);
+    /* Move book up slightly on hover */
+}

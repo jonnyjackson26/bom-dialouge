@@ -1,0 +1,14 @@
+.verse-class {
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+}
+
+.verse-number-class {
+    font-size: 1.05rem;
+    font-weight: bold;
+}
+
+.nextButton-container {
+    display: flex;
+    justify-content: space-between;
+}

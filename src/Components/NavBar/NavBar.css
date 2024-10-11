@@ -1,0 +1,78 @@
+body {
+    padding-top: 20px;
+    /*so the navbar doesnt cover the top of the content*/
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px 20px;
+    z-index: 1000;
+    /* Ensure navbar stays on top */
+}
+
+.brand a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+
+.nav-links {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.nav-links li {
+    margin-right: 20px;
+}
+
+.nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.icon {
+    width: 45px;
+}
+
+
+/* Assuming these are generic styles, adjust as needed */
+
+#languageSelect {
+    font-size: 16px;
+    margin-right: 7px;
+    border: 0px;
+    background-color: transparent;
+    color: white;
+    appearance: none;
+    /* Removes default arrow in some browsers */
+    cursor: pointer;
+    /* Show pointer cursor on hover */
+    outline: none;
+    /* Remove focus outline */
+    width: 50px;
+    /* Adjust width as needed */
+}
+
+#languageSelect option {
+    background-color: #fff;
+    color: #333;
+}
+
+#languageSelect option:hover {
+    background-color: #f0f0f0;
+}
+
+#languageSelect option:checked {
+    font-weight: bold;
+}

@@ -1,0 +1,15 @@
+#path-container {
+    display: flex;
+}
+
+.link {
+    color: rgb(245, 89, 89);
+    text-decoration: none;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+.link:not(:last-child)+.link::before {
+    /*add a < after each link except for last */
+    content: " < ";
+}
