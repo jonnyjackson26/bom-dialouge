@@ -15,8 +15,9 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
     const [verses, setVerses] = useState([]);
     const [dialougeInfo, setDialougeInfo] = useState([]);
     
-    DocumentTitle(book.urlName + " " + chapter);
+    DocumentTitle(book.bookName + " " + chapter);
 
+    //verses
     useEffect(() => {
         const fetchVerses = async () => {
             try {
@@ -37,11 +38,12 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
         fetchVerses();
     }, [book.urlName, chapter]);
 
+    //dialouge
     useEffect(() => {
         const fetchDialouge = async () => {
             const sheetId = sheet_id;
             const apiKey = google_api_key;
-            const range = "Sheet1!A1:C1"; // Fetching B1 to B11
+            const range = "Sheet1"; 
     
             const response = await axios.get(
                 `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
@@ -49,11 +51,22 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
     
             const data = response.data.values || [];  // Ensure 'data' is not undefined
     
-            setDialougeInfo({
-                person: data[0] ? data[0][0] : "",        // B10 -> youtube_url
-                bookURL: data[0] ? data[0][1] : "",      // B11 -> twitter_url
-                chapter: data[0] ? data[0][2] : "",      // B11 -> twitter_url
+            // Assuming the first row is the header and the following rows are the data
+            const headers = data[0]; // ['person', 'bookUrl', 'chapter', 'verseStart', 'verseEnd', 'wordStart', 'wordEnd']
+            const rows = data.slice(1); // The rest of the data
+
+            // Map each row to an object with keys based on the headers
+            const formattedData = rows.map(row => {
+                let obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index];
+                });
+                return obj;
             });
+
+            setDialougeInfo(formattedData); // Set the formatted data into state
+
+
         };
         fetchDialouge();
     }, []);
@@ -68,9 +81,8 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
                 The book of {book.urlName} chapter {chapter}
             </h1>
 
-            <p>{dialougeInfo.person}</p>
-            <p>{dialougeInfo.bookURL}</p>
-            <p>{dialougeInfo.chapter}</p>
+            {dialougeInfo.length > 0 && <p>{dialougeInfo[0]["person"]}</p>}
+
 
 
             <div className="nextButton-container">
