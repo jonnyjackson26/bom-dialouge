@@ -6,6 +6,7 @@ import DocumentTitle from '../../Components/DocumentTitle.jsx';
 import { getNextButtonInfo, getPrevButtonInfo } from "../../utils/next-and-prev-button-info.js"
 import books from "../../../public/data/books.js"
 import "../ChapterPage/ChapterPage.css"
+import "./dialouge.css"
 
 //google sheets database 
 import axios from 'axios';
@@ -27,7 +28,6 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
                 const text = await response.text();
                 const lines = text.split('\n').slice(0, -1); //I slice because the text files have an empty \n at the end
                 setVerses(lines.map((line, index) => <p className="verse-class" key={index}>
-                    <span className="verse-number-class" >{index + 1} </span>
                     {line}
                 </p>));
 
@@ -72,6 +72,34 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
     }, []);
 
 
+    const processedChapterText = (verses, dialouges) => {
+        // Initialize the processed text as an array to collect parts of the chapter
+        const processedText = [];
+    
+        verses.forEach((verse, index) => {
+            // Here, you'd include logic to process each verse based on dialogueInfo
+            // For demonstration, we're just wrapping each verse in a paragraph tag
+            let verseText = verse.props.children; // Assume verse.text contains the actual verse text
+
+            // You would replace the following with your highlighting logic
+            /*dialouges.forEach(({ person, wordStart, wordEnd }) => {
+                const words = verseText.split(' ');
+                const startIndex = wordStart - 1; // Convert to 0-based index
+                const endIndex = wordEnd; // This will be the slice endpoint
+                
+                // Wrap the words in a span for the specified person
+                const highlightedWords = `<span class="${person}">${words.slice(startIndex, endIndex).join(' ')}</span>`;
+                words.splice(startIndex, endIndex - startIndex, highlightedWords);
+                verseText = words.join(' '); // Join the modified words back into a string
+            });*/
+    
+            // Add the processed verse to the array
+            processedText.push(`<p class='verse-class'><span class='verse-number-class'>${index+1}</span> ${verseText}</p>`);
+        });
+    
+        // Join all processed text and return as a single string
+        return processedText.join('');
+    };
 
     return (
         <>
@@ -81,9 +109,6 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
                 The book of {book.urlName} chapter {chapter}
             </h1>
 
-            {dialougeInfo.length > 0 && <p>{dialougeInfo[0]["person"]}</p>}
-
-
 
             <div className="nextButton-container">
                 <LinkButton text={getPrevButtonInfo(book, chapter).text} path={getPrevButtonInfo(book, chapter).path} />
@@ -91,8 +116,10 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
             </div>
 
 
+             {/* you gotta do .length>0 bc it takes time to get the data but render is near-instant. */}
+            {dialougeInfo.length > 0 && <div dangerouslySetInnerHTML={{ __html: processedChapterText(verses, dialougeInfo) }} />}
 
-            {verses}
+
         </>
     );
 }
