@@ -38,6 +38,7 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
         fetchVerses();
     }, [book.urlName, chapter]);
 
+    //TODO: NEED TO INCLUDE LOGIC TO NOT GET THE WHOLE DATABASE, BUT ONLY WITH THE CURRENT BOOK AND CHAPTER
     //dialouge
     useEffect(() => {
         const fetchDialouge = async () => {
@@ -73,33 +74,31 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
 
 
     const processedChapterText = (verses, dialouges) => {
-        // Initialize the processed text as an array to collect parts of the chapter
         const processedText = [];
     
         verses.forEach((verse, index) => {
-            // Here, you'd include logic to process each verse based on dialogueInfo
-            // For demonstration, we're just wrapping each verse in a paragraph tag
-            let verseText = verse.props.children; // Assume verse.text contains the actual verse text
-
-            // You would replace the following with your highlighting logic
-            /*dialouges.forEach(({ person, wordStart, wordEnd }) => {
-                const words = verseText.split(' ');
-                const startIndex = wordStart - 1; // Convert to 0-based index
-                const endIndex = wordEnd; // This will be the slice endpoint
-                
-                // Wrap the words in a span for the specified person
-                const highlightedWords = `<span class="${person}">${words.slice(startIndex, endIndex).join(' ')}</span>`;
-                words.splice(startIndex, endIndex - startIndex, highlightedWords);
-                verseText = words.join(' '); // Join the modified words back into a string
-            });*/
+            let highlightedText = verse.props.children; // Start with the original verse text
+            const verseNumber = index + 1;
     
-            // Add the processed verse to the array
-            processedText.push(`<p class='verse-class'><span class='verse-number-class'>${index+1}</span> ${verseText}</p>`);
+            // Loop through dialogue information to find words to highlight
+            dialouges.forEach(({ person, verseStart, verseEnd, wordStart, wordEnd }) => {
+                // Only process dialogues that are within the current verse
+                if (verseNumber >= parseInt(verseStart) && verseNumber <= parseInt(verseEnd)) {
+                    highlightedText=`<span class='${person}'>${highlightedText}</span>`
+                }
+            });
+    
+            // Add the processed verse with the verse number and highlighted text
+            processedText.push(
+                `<p class='verse-class'><span class='verse-number-class'>${verseNumber}</span> ${highlightedText}</p>`
+            );
         });
     
         // Join all processed text and return as a single string
         return processedText.join('');
     };
+    
+    
 
     return (
         <>
