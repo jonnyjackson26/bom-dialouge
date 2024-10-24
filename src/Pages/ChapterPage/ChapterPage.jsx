@@ -18,8 +18,8 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
     
     DocumentTitle(book.bookName + " " + chapter);
 
-    //verses
     useEffect(() => {
+        //verses
         const fetchVerses = async () => {
             try {
                 let path = "";
@@ -27,50 +27,59 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
                 const response = await fetch(path);
                 const text = await response.text();
                 const lines = text.split('\n').slice(0, -1); //I slice because the text files have an empty \n at the end
-                setVerses(lines.map((line, index) => <p className="verse-class" key={index}>
-                    {line}
-                </p>));
+                setVerses(lines);
 
             } catch (error) {
                 console.error('Error fetching verses:', error);
             }
         };
         fetchVerses();
+
+
+        //dialouge
+        const fetchDialouge = async () => {
+            try {
+                const sheetId = sheet_id;
+                const apiKey = google_api_key;
+                const range = "Sheet1";
+        
+                const response = await axios.get(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
+                );
+        
+                const data = response.data.values || [];
+                
+                if (!data.length) {
+                    console.warn("No data received from Google Sheets");
+                    return;
+                }
+        
+                const headers = data[0];
+                const rows = data.slice(1);
+        
+                const formattedData = rows.map(row => {
+                    let obj = {};
+                    headers.forEach((header, index) => {
+                        obj[header] = row[index];
+                    });
+                    return obj;
+                });
+
+                const filteredData = formattedData.filter(row => {
+                    return row.bookUrl === book.urlName && String(row.chapter) === String(chapter);
+                });
+        
+                setDialougeInfo(filteredData);
+        
+            } catch (error) {
+                console.error("Error fetching dialogue:", error); // Add this
+            }
+        };
+        
+        fetchDialouge();
     }, [book.urlName, chapter]);
 
-    //TODO: NEED TO INCLUDE LOGIC TO NOT GET THE WHOLE DATABASE, BUT ONLY WITH THE CURRENT BOOK AND CHAPTER
-    //dialouge
-    useEffect(() => {
-        const fetchDialouge = async () => {
-            const sheetId = sheet_id;
-            const apiKey = google_api_key;
-            const range = "Sheet1"; 
     
-            const response = await axios.get(
-                `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
-            );
-    
-            const data = response.data.values || [];  // Ensure 'data' is not undefined
-    
-            // Assuming the first row is the header and the following rows are the data
-            const headers = data[0]; // ['person', 'bookUrl', 'chapter', 'verseStart', 'verseEnd', 'wordStart', 'wordEnd']
-            const rows = data.slice(1); // The rest of the data
-
-            // Map each row to an object with keys based on the headers
-            const formattedData = rows.map(row => {
-                let obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = row[index];
-                });
-                return obj;
-            });
-
-            setDialougeInfo(formattedData); // Set the formatted data into state
-
-
-        };
-        fetchDialouge();
-    }, []);
 
     /*
     * Documentation: 1 nephi 1:13 says "And he read, saying: Wo, wo, unto Jerusalem, for I have seen thine abominations! Yea, and many things ..."
@@ -79,10 +88,15 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
     */
 
                 const processedChapterText = (verses, dialouges) => {
+                    if (dialouges.length === 0) {  // If there are no dialogues, return verses normally
+                        return verses.map((verse, index) => 
+                            `<p class='verse-class'><span class='verse-number-class'>${index + 1}</span> ${verse}</p>`
+                        ).join('');
+                    }
                     const processedText = [];
                 
                     verses.forEach((verse, index) => {
-                        let highlightedText = verse.props.children; // Start with the original verse text
+                        let highlightedText = verse; // Start with the original verse text
                         const verseNumber = index + 1;
                     
                         // Loop through dialogue information to find words to highlight
@@ -161,10 +175,8 @@ export function ChapterPage({ book, chapter, setSelectedChapter, setSelectedBook
             </div>
 
 
-            {dialougeInfo.length > 0 && console.log(dialougeInfo)}
-
              {/* you gotta do .length>0 bc it takes time to get the data but render is near-instant. */}
-            {dialougeInfo.length > 0 && <div dangerouslySetInnerHTML={{ __html: processedChapterText(verses, dialougeInfo) }} />}
+            {verses.length>0 && <div dangerouslySetInnerHTML={{ __html: processedChapterText(verses, dialougeInfo) }} />}
 
 
         </>
